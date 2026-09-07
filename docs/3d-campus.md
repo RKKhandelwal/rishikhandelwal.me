@@ -44,3 +44,7 @@ At the site owner's request, the shared background uses the Quiet Horizon image 
 - https://www.csaye.com/textures/soft-grain.svg
 
 Both assets are served locally from `public/backgrounds`. The fixed, decorative layer uses a muted image treatment and a subtle overlay; it receives no pointer events and is hidden from assistive technology. The existing campus canvas stays transparent so the background remains visible behind the 3D scene.
+
+## Chapter dock
+
+The chapter navigation uses a translucent, blurred glass surface and a single sliding selection lens. The lens tracks the selected button's measured bounds, including the two-row mobile layout and font/viewport resizing. Switching chapters animates its position and size; reduced-motion preferences disable the transitions. Opaque fallback styling supports browsers without backdrop filtering. Map labels, navigation buttons, and story rows use unnumbered names.

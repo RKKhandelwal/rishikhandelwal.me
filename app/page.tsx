@@ -11,7 +11,6 @@ export default function Home() {
       <CampusExplorer />
       <section id="timeline" className="timeline-section">
         <div className="section-heading">
-          <p className="eyebrow">THE FIELD NOTES / 2022 — NOW</p>
           <h2>
             Different places.
             <br />
@@ -23,9 +22,8 @@ export default function Home() {
           </p>
         </div>
         <div className="timeline">
-          {timeline.map((item, index) => (
+          {timeline.map((item) => (
             <article className={`timeline-card ${item.color}`} key={item.slug}>
-              <span className="card-index">0{index + 1}</span>
               <div className="card-copy">
                 <p className="date">
                   {item.date} <span> / {item.period}</span>
@@ -50,7 +48,6 @@ export default function Home() {
         </div>
       </section>
       <footer>
-        <p className="eyebrow">THE NEXT CHAPTER IS STILL UNWRITTEN.</p>
         <h2>
           Let&apos;s make
           <br />
@@ -59,7 +56,6 @@ export default function Home() {
         <a href="mailto:rkrishikhandelewal@gmail.com">Say hello ↗</a>
         <div className="footer-bottom">
           <span>Rishi Khandelwal</span>
-          <a href="#">Back to the world ↑</a>
         </div>
       </footer>
     </main>
