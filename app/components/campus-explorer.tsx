@@ -25,6 +25,37 @@ const chapters = [
 export default function CampusExplorer() {
   const [selected, setSelected] = useState<string | null>(null);
   const [paused, setPaused] = useState(true);
+  const dock = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  useEffect(() => {
+    const nav = dock.current;
+    if (!nav) return;
+    let active = true;
+    const measure = () => {
+      if (!active) return;
+      const button = nav.querySelector<HTMLButtonElement>(
+        '[aria-pressed="true"]',
+      );
+      if (button)
+        setPill({
+          x: button.offsetLeft,
+          y: button.offsetTop,
+          width: button.offsetWidth,
+          height: button.offsetHeight,
+        });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    Array.from(nav.querySelectorAll("button")).forEach((button) =>
+      observer.observe(button),
+    );
+    document.fonts.ready.then(measure);
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
+  }, [selected]);
   const previewHeading = useRef<HTMLHeadingElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const selectPlace = (slug: string) => {
@@ -102,7 +133,17 @@ export default function CampusExplorer() {
         </aside>
       )}
       <div className="world-bottom">
-        <nav className="chapter-dock" aria-label="Campus stories">
+        <nav ref={dock} className="chapter-dock" aria-label="Campus stories">
+          <span
+            className="dock-selection"
+            aria-hidden="true"
+            style={{
+              width: pill.width,
+              height: pill.height,
+              transform: `translate3d(${pill.x}px, ${pill.y}px, 0)`,
+              opacity: selected && pill.width ? 1 : 0,
+            }}
+          />
           {timeline.map((item, i) => (
             <button
               key={item.slug}
@@ -110,14 +151,10 @@ export default function CampusExplorer() {
               aria-pressed={selected === item.slug}
               onClick={() => selectPlace(item.slug)}
             >
-              <span className="dock-number">0{i + 1}</span>
               {chapters[i]}
             </button>
           ))}
         </nav>
-        <a className="list-link" href="#timeline">
-          All stories <span>↓</span>
-        </a>
       </div>
     </section>
   );

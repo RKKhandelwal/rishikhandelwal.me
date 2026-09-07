@@ -225,7 +225,6 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
           tabIndex={status === "ready" ? 0 : -1}
           style={{ visibility: "hidden" }}
         >
-          <span>{String(i + 1).padStart(2, "0")}</span>
           {landmark.label}
         </button>
       ))}
