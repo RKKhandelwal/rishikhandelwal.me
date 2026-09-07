@@ -9,20 +9,13 @@ type Props = {
   selected: string | null;
   onSelect: (slug: string) => void;
   paused: boolean;
-  resetKey: number;
 };
 
-export default function CampusScene({
-  selected,
-  onSelect,
-  paused,
-  resetKey,
-}: Props) {
+export default function CampusScene({ selected, onSelect, paused }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const pins = useRef<(HTMLButtonElement | null)[]>([]);
   const callbacks = useRef({ onSelect, paused });
   callbacks.current = { onSelect, paused };
-  const reset = useRef<() => void>(() => {});
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
@@ -120,14 +113,14 @@ export default function CampusScene({
       renderer.setSize(width, height);
       render();
     };
-    reset.current = () => {
+    const initializeView = () => {
       camera.position.set(22, 24, 30);
       controls.target.set(0, 0, 0);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
       render();
     };
-    reset.current();
+    initializeView();
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(container);
@@ -199,9 +192,6 @@ export default function CampusScene({
       renderer.domElement.remove();
     };
   }, []);
-  useEffect(() => {
-    reset.current();
-  }, [resetKey]);
 
   return (
     <div

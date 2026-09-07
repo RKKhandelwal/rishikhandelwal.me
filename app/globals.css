@@ -1012,3 +1012,15 @@ footer > a:hover {
 .site-header > p {
   letter-spacing: 0.025em;
 }
+
+@media (max-width: 700px) {
+  .world-intro {
+    top: 50px;
+  }
+  .world-stage {
+    top: 250px;
+  }
+  .campus {
+    min-height: 860px;
+  }
+}
