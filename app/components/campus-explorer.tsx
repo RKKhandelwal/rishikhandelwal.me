@@ -25,7 +25,6 @@ const chapters = [
 export default function CampusExplorer() {
   const [selected, setSelected] = useState<string | null>(null);
   const [paused, setPaused] = useState(true);
-  const [resetKey, setResetKey] = useState(0);
   const previewHeading = useRef<HTMLHeadingElement>(null);
   const trigger = useRef<HTMLElement | null>(null);
   const selectPlace = (slug: string) => {
@@ -60,19 +59,7 @@ export default function CampusExplorer() {
 
   return (
     <section className="campus" aria-label="Explore Rishi’s world">
-      <header className="site-header">
-        <a className="wordmark" href="/" aria-label="Rishi Khandelwal home">
-          Rishi K<span>.</span>
-        </a>
-        <p>LEARNING. BUILDING. SHOWING UP.</p>
-        <a className="contact-link" href="mailto:rkrishikhandelewal@gmail.com">
-          Say hello <span>↗</span>
-        </a>
-      </header>
       <div className="world-intro">
-        <p className="eyebrow">
-          <span className="live-dot" /> WELCOME TO MY LITTLE WORLD
-        </p>
         <h1>
           Rishi
           <br />
@@ -82,37 +69,13 @@ export default function CampusExplorer() {
           A student. A teammate. A curious mind.
           <br />A few places that have shaped me.
         </p>
-        <a className="text-link" href="#timeline">
-          Take the scenic route <span>↘</span>
-        </a>
       </div>
       <div className="world-stage">
         <CampusScene
           selected={selected}
           onSelect={selectPlace}
           paused={paused}
-          resetKey={resetKey}
         />
-      </div>
-      <div className="world-caption">
-        <span className="compass" aria-hidden="true">
-          N<br />↑
-        </span>
-        <span>
-          A SMALL WORLD.
-          <br />A LOT TO DISCOVER.
-        </span>
-      </div>
-      <div className="world-tools">
-        <button onClick={() => setPaused(!paused)} aria-pressed={paused}>
-          {paused ? "▷ Resume motion" : "Ⅱ Pause motion"}
-        </button>
-        <button
-          onClick={() => setResetKey((key) => key + 1)}
-          aria-label="Reset campus view"
-        >
-          ↺ <span>Reset view</span>
-        </button>
       </div>
       {item && (
         <aside className="place-card" aria-label={`${item.title} preview`}>
@@ -139,10 +102,6 @@ export default function CampusExplorer() {
         </aside>
       )}
       <div className="world-bottom">
-        <p className="world-hint">
-          <span className="desktop-hint">Drag to look around · </span>Choose a
-          place to open its story
-        </p>
         <nav className="chapter-dock" aria-label="Campus stories">
           {timeline.map((item, i) => (
             <button
