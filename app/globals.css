@@ -538,16 +538,6 @@ footer > a {
     monospace;
   color: var(--muted);
 }
-.story-icon {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  font-size: 27px;
-  margin-top: 25px;
-}
 .story-photo {
   height: 420px;
   background-position: center;
