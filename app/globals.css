@@ -998,3 +998,17 @@ footer > a:hover {
     font-size: 0.75rem;
   }
 }
+
+/* Quiet sans-serif labels share the body typeface; mono is reserved for indexes. */
+.eyebrow,
+.site-header > p,
+.date,
+.tag {
+  font-family: var(--font-body), Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+.world-intro .eyebrow,
+.site-header > p {
+  letter-spacing: 0.025em;
+}
