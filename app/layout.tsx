@@ -33,6 +33,9 @@ export default function RootLayout({
       <body
         className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable}`}
       >
+        <div className="site-background" aria-hidden="true">
+          <span />
+        </div>
         {children}
       </body>
     </html>

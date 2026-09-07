@@ -1,6 +1,6 @@
 :root {
   --ink: #101513;
-  --paper: #ffffff;
+  --paper: #faf9f6;
   --muted: #61686d;
   --line: #e0e4e7;
   --accent: #2e5bef;
@@ -61,12 +61,7 @@ a:hover {
   height: 100svh;
   max-height: 1250px;
   overflow: hidden;
-  background: radial-gradient(
-    ellipse at 60% 50%,
-    #eef4f6 0,
-    #f8fafb 48%,
-    #ffffff 83%
-  );
+  background: transparent;
 }
 .site-header {
   position: absolute;
@@ -1023,4 +1018,44 @@ footer > a:hover {
   .campus {
     min-height: 860px;
   }
+}
+
+/* Quiet Horizon background, as requested from csaye.com. */
+.site-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--paper);
+}
+.site-background::before {
+  content: "";
+  position: absolute;
+  inset: -5%;
+  background: url("/backgrounds/quiet-horizon.avif") 48% center / cover
+    no-repeat;
+  filter: saturate(0.74) contrast(0.9);
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+.site-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(56% 38% at 50% 48%, #faf9f63d, transparent 76%),
+    linear-gradient(#faf9f60a, #faf9f61a);
+}
+.site-background > span {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: url("/backgrounds/soft-grain.svg") 0 0 / 180px 180px;
+  mix-blend-mode: soft-light;
+  opacity: 0.035;
+}
+body > main {
+  position: relative;
+  z-index: 1;
 }

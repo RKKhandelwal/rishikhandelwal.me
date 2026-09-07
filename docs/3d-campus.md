@@ -35,3 +35,12 @@ npm run dev
 ```
 
 For production verification, stop the development server before running `npm run build` and `npm start` because Next.js 14 shares the `.next` directory between development and production.
+
+## Background source
+
+At the site owner's request, the shared background uses the Quiet Horizon image and soft-grain texture from [Cooper Saye's website](https://www.csaye.com/) (retrieved September 7, 2026):
+
+- https://www.csaye.com/backgrounds/quiet-horizon.avif
+- https://www.csaye.com/textures/soft-grain.svg
+
+Both assets are served locally from `public/backgrounds`. The fixed, decorative layer uses a muted image treatment and a subtle overlay; it receives no pointer events and is hidden from assistive technology. The existing campus canvas stays transparent so the background remains visible behind the 3D scene.
