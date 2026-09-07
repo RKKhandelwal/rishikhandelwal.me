@@ -80,12 +80,12 @@ export function createCampus() {
     world.add(group);
     groups.set(slug, group);
   });
-  const grass = "#88a878",
-    cream = "#f3e7cc",
+  const grass = "#73a681",
+    cream = "#eceee7",
     dark = "#294e48",
-    orange = "#d5794c",
+    orange = "#3668c9",
     blue = "#7ca6a7";
-  box(20, 0.65, 17, "#c8b58d", 0, -0.4, 0);
+  box(20, 0.65, 17, "#b2b9a1", 0, -0.4, 0);
   box(20.15, 0.18, 17.15, grass, 0, 0, 0);
   // Intersecting pedestrian promenades and little paved entrances.
   box(19.5, 0.025, 1.1, cream, 0, 0.11, 0.4);
@@ -162,7 +162,7 @@ export function createCampus() {
 
   // Tennis: doubles lines, mesh net, floodlights, bleachers, and a rally.
   const tennis = groups.get("varsity-tennis")!;
-  box(8.2, 0.15, 6.2, "#d39a77", 4.6, 0.18, 4.6, tennis);
+  box(8.2, 0.15, 6.2, "#c4d86b", 4.6, 0.18, 4.6, tennis);
   box(7.2, 0.025, 5.2, "#497f76", 4.6, 0.27, 4.6, tennis);
   box(6.4, 0.03, 4.4, "#658ba2", 4.6, 0.29, 4.6, tennis);
   const line = (w: number, d: number, x: number, z: number) =>
@@ -281,7 +281,7 @@ export function createCampus() {
     cylinder(0.1 * size, 1.1 * size, "#80684b", x, 0.65 * size, z);
     const crown = sphere(
       0.68 * size,
-      x % 2 ? "#4d795b" : "#648d5c",
+      x % 2 ? "#376d53" : "#50865c",
       x,
       1.5 * size,
       z,

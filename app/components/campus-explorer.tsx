@@ -62,9 +62,9 @@ export default function CampusExplorer() {
     <section className="campus" aria-label="Explore Rishi’s world">
       <header className="site-header">
         <a className="wordmark" href="/" aria-label="Rishi Khandelwal home">
-          rk<span>.</span>
+          Rishi K<span>.</span>
         </a>
-        <p>A WORK IN CURIOSITY</p>
+        <p>LEARNING. BUILDING. SHOWING UP.</p>
         <a className="contact-link" href="mailto:rkrishikhandelewal@gmail.com">
           Say hello <span>↗</span>
         </a>

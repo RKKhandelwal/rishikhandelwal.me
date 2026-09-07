@@ -8,12 +8,18 @@ The homepage translates the six existing timeline entries into an original inter
 
 This implementation uses Three.js directly with an orthographic camera, soft directional shadows, low-poly geometry, OrbitControls, raycast selection, and projected HTML buttons. All campus geometry is original; no Persona code, models, textures, or branding were copied. The existing Next.js architecture and timeline data are preserved.
 
-- **School:** a terracotta-roofed hall and clock tower.
+- **School:** a blue-roofed hall and clock tower.
 - **Community:** a shared learning table, books, and benches.
 - **Aviation:** a miniature biplane on a museum apron.
 - **Tennis:** doubles and service lines, net, players, lights, bleachers, and an animated ball.
 - **Mathematics:** a book pavilion and rotating ring.
 - **Research:** a lab and abstract molecule sculpture (decorative, not a scientific model).
+
+## Visual system
+
+The interface takes its typography from [Supermemory](https://supermemory.ai/): Space Grotesk headings and DM Sans body text, with DM Mono for small indexes. Fonts are bundled through `next/font/google` at build time, so visitors do not need to request them from Google. [Ramp](https://ramp.com/) uses Lausanne; this project uses the openly available Supermemory pairing instead of redistributing Ramp's font files.
+
+White surfaces, near-black text, thin neutral borders, modest corner radii, and blue primary actions follow Supermemory's restrained interface. Lime contact/selected accents take inspiration from Ramp and echo the tennis scene. There is no serif display font. The same tokens and heading treatment carry through the campus, story list, story previews, and detail pages.
 
 ## Interaction and accessibility
 
