@@ -23,7 +23,7 @@ White surfaces, near-black text, thin neutral borders, modest corner radii, and 
 
 ## Interaction and accessibility
 
-Drag with a mouse to rotate the campus. Mouse-wheel and touch scrolling remain available for the page. On touch devices the scene stays framed and its buttons/dock provide story selection. Ambient animation respects the operating system's reduced-motion preference. Selecting a story moves keyboard focus to its preview; Escape/Close restores the trigger.
+Drag with a mouse to orbit the campus freely through 360 degrees and tilt from pole to pole. Releasing the pointer lets the view coast smoothly to a stop; reduced-motion preferences disable this inertia. Mouse-wheel and touch scrolling remain available for the page. On touch devices the scene stays framed and its buttons/dock provide story selection. Ambient animation respects the operating system's reduced-motion preference. Selecting a story moves keyboard focus to its preview; Escape/Close restores the trigger.
 
 The scene is dynamically imported only on the client. Renderer pixel density is capped, and animation rendering stops while offscreen, hidden, or reduced motion is enabled. Meshes, materials, controls, observers, listeners, the shadow map, and the renderer are disposed on unmount. Devices without WebGL get an explanatory message and can still access every story through the dock and ordinary links.
 

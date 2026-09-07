@@ -42,11 +42,9 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePan = false;
     controls.enableZoom = false; // Scrolling remains available to reach the story list.
-    controls.enableDamping = false;
-    controls.minPolarAngle = Math.PI / 5;
-    controls.maxPolarAngle = Math.PI / 2.7;
-    controls.minAzimuthAngle = -Math.PI / 4;
-    controls.maxAzimuthAngle = Math.PI / 2.5;
+    // Leave the default full orbit range: unlimited azimuth and pole-to-pole tilt.
+    controls.enableDamping = !callbacks.current.paused;
+    controls.dampingFactor = 0.075;
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
@@ -79,7 +77,8 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
       frame = 0,
       time = 0,
       last = 0,
-      inView = true;
+      inView = true,
+      needsRender = true;
     const projectPins = () => {
       anchors.forEach((anchor, i) => {
         const point = anchor.clone().project(camera);
@@ -95,9 +94,9 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
       });
     };
     const render = () => {
-      controls.update();
       renderer.render(scene, camera);
       projectPins();
+      needsRender = false;
     };
     const resize = () => {
       width = container.clientWidth;
@@ -118,6 +117,7 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
       controls.target.set(0, 0, 0);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
+      controls.update();
       render();
     };
     initializeView();
@@ -132,16 +132,22 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
       frame = requestAnimationFrame(tick);
       const elapsed = Math.min((now - last) / 1000, 0.05);
       last = now;
-      if (!inView || document.hidden || callbacks.current.paused) return;
-      time += elapsed;
-      campus.animate(time);
-      render();
+      if (!inView || document.hidden) return;
+      // Integrate inertia once per frame, including after the pointer is released.
+      // Normalize damping so high-refresh screens have the same settling time.
+      controls.enableDamping = !callbacks.current.paused;
+      controls.dampingFactor = 1 - Math.pow(1 - 0.075, elapsed * 60);
+      controls.update();
+      if (!callbacks.current.paused) {
+        time += elapsed;
+        campus.animate(time);
+      }
+      if (needsRender || !callbacks.current.paused) render();
     };
     frame = requestAnimationFrame(tick);
     controls.addEventListener("change", renderOnChange);
     function renderOnChange() {
-      renderer.render(scene, camera);
-      projectPins();
+      needsRender = true;
     }
     const raycaster = new THREE.Raycaster();
     let down = { x: 0, y: 0 };
