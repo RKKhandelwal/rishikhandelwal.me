@@ -3,12 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { createCampus, landmarks } from "./campus-world";
+import { createCampus, landmarks, type Campus } from "./campus-world";
 
 type Props = {
   selected: string | null;
   onSelect: (slug: string) => void;
   paused: boolean;
+  /** Identity index per court player; swapped by the easter egg. */
+  identities: number[];
+  onPlayerCycle: (playerIndex: number) => void;
 };
 
 /**
@@ -60,12 +63,27 @@ function flightPose(progress: number) {
   };
 }
 
-export default function CampusScene({ selected, onSelect, paused }: Props) {
+export default function CampusScene({
+  selected,
+  onSelect,
+  paused,
+  identities,
+  onPlayerCycle,
+}: Props) {
   const host = useRef<HTMLDivElement>(null);
   const pins = useRef<(HTMLButtonElement | null)[]>([]);
-  const callbacks = useRef({ onSelect, paused });
-  callbacks.current = { onSelect, paused };
+  const callbacks = useRef({ onSelect, paused, onPlayerCycle });
+  callbacks.current = { onSelect, paused, onPlayerCycle };
+  const campus = useRef<Campus | null>(null);
+  const identityRef = useRef(identities);
+  identityRef.current = identities;
   const [status, setStatus] = useState("loading");
+  // The easter egg restyles the players whenever the roster selection changes.
+  useEffect(() => {
+    identities.forEach((identity, player) =>
+      campus.current?.setIdentity(player, identity),
+    );
+  }, [identities]);
 
   useEffect(() => {
     const container = host.current!;
@@ -113,8 +131,12 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
     renderer.domElement.style.touchAction = "pan-y";
     // Mobile keeps native scrolling; all landmarks remain available in the dock.
     controls.enabled = window.matchMedia("(pointer: fine)").matches;
-    const campus = createCampus();
-    scene.add(campus.world);
+    const campusWorld = createCampus();
+    campus.current = campusWorld;
+    identityRef.current.forEach((identity, player) =>
+      campusWorld.setIdentity(player, identity),
+    );
+    scene.add(campusWorld.world);
     scene.add(new THREE.HemisphereLight("#fff4dd", "#7c9381", 2.7));
     const sun = new THREE.DirectionalLight("#fff0d5", 3.5);
     sun.position.set(-10, 18, 12);
@@ -241,7 +263,7 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
         }
       } else {
         time += elapsed;
-        campus.animate(time);
+        campusWorld.animate(time);
         if (runway && finePointer.matches) {
           const bounds = runway.getBoundingClientRect();
           const span = bounds.height - window.innerHeight;
@@ -299,6 +321,9 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
     const pointerDown = (e: PointerEvent) => {
       down = { x: e.clientX, y: e.clientY };
     };
+    // Easter egg: double-tapping a court player cycles their identity.
+    // A single tap still opens the tennis story, like any other landmark.
+    let tap = { player: -1, at: 0 };
     const pointerUp = (e: PointerEvent) => {
       if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) return;
       const bounds = renderer.domElement.getBoundingClientRect();
@@ -309,8 +334,26 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
         ),
         camera,
       );
-      const hit = raycaster.intersectObjects(campus.world.children, true)[0];
+      const hit = raycaster.intersectObjects(
+        campusWorld.world.children,
+        true,
+      )[0];
       let object: THREE.Object3D | null = hit?.object ?? null;
+      let player = -1;
+      while (object) {
+        if (object.userData.tennisPlayer !== undefined)
+          player = object.userData.tennisPlayer;
+        if (object.userData.slug) break;
+        object = object.parent;
+      }
+      const now = performance.now();
+      if (player >= 0 && player === tap.player && now - tap.at < 400) {
+        tap = { player: -1, at: 0 };
+        callbacks.current.onPlayerCycle(player);
+      } else {
+        tap = { player, at: now };
+      }
+      object = hit?.object ?? null;
       while (object) {
         if (object.userData.slug) {
           callbacks.current.onSelect(object.userData.slug);
@@ -341,7 +384,8 @@ export default function CampusScene({ selected, onSelect, paused }: Props) {
       renderer.domElement.removeEventListener("pointerdown", pointerDown);
       renderer.domElement.removeEventListener("pointerup", pointerUp);
       renderer.domElement.removeEventListener("webglcontextlost", contextLost);
-      campus.dispose();
+      campus.current = null;
+      campusWorld.dispose();
       sun.shadow.dispose();
       renderer.dispose();
       renderer.domElement.remove();

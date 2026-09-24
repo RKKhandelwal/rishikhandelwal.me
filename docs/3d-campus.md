@@ -11,7 +11,7 @@ This implementation uses Three.js directly with an orthographic camera, soft dir
 - **School:** a blue-roofed hall and clock tower.
 - **Community:** a shared learning table, books, and benches.
 - **Aviation:** a miniature biplane on a museum apron.
-- **Tennis:** doubles and service lines, net, players, lights, bleachers, and an animated ball.
+- **Tennis:** doubles and service lines, net, lights, bleachers, and two structured player rigs rallying — each swings and hops as the ball arrives.
 - **Mathematics:** a book pavilion and rotating ring.
 - **Research:** a lab and abstract molecule sculpture (decorative, not a scientific model).
 
@@ -24,6 +24,10 @@ White surfaces, near-black text, thin neutral borders, modest corner radii, and 
 ## Interaction and accessibility
 
 Drag with a mouse to orbit the campus freely through 360 degrees and tilt from pole to pole. Releasing the pointer lets the view coast smoothly to a stop; reduced-motion preferences disable this inertia. Mouse-wheel and touch scrolling remain available for the page. On touch devices the scene stays framed and its buttons/dock provide story selection. Ambient animation respects the operating system's reduced-motion preference. Selecting a story moves keyboard focus to its preview; Escape/Close restores the trigger.
+
+## Court easter egg
+
+The two campus players can change identity. Double-click (or double-tap) a player on the court to cycle the roster — Rishi → Roger Federer → Rafael Nadal → Novak Djokovic → Serena Williams → Andre Agassi — or type a legend's name anywhere on the homepage (`federer`/`roger`, `nadal`/`rafa`, `djokovic`/`nole`, `serena`/`williams`, `agassi`) to swap both players at once. `deuce` shuffles a random final, and `rishi`/`reset` calls it back. Each identity is plain data in `tennis-roster.ts` (kit colors, skin, hair length, sleeves, headband, racket), applied by `setIdentity` in `campus-world.ts`, which swaps cached materials and toggles silhouette parts on the rig. Every change surfaces as a `role="status"` toast, so screen readers hear the lineup change; the tennis story card and detail page carry a subtle hint. Single clicks on players still open the tennis landmark as before.
 
 ## Scroll flight
 

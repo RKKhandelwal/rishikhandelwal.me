@@ -1262,3 +1262,65 @@ body > main {
     border-radius: 16px;
   }
 }
+
+/* Court easter egg: a broadcast-style toast announcing the new player. */
+.court-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 132px;
+  transform: translateX(-50%);
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  max-width: min(92vw, 620px);
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid #2b343a;
+  background: var(--ink);
+  color: var(--paper);
+  font:
+    500 0.75rem/1.4 var(--font-mono),
+    monospace;
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 14px 44px #101b2d40;
+  pointer-events: none;
+  animation: toast-pop 0.42s cubic-bezier(0.22, 1.25, 0.36, 1) both;
+}
+@keyframes toast-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px) scale(0.92);
+  }
+}
+@media (max-width: 700px) {
+  .court-toast {
+    bottom: 210px;
+    white-space: normal;
+    border-radius: 18px;
+    text-align: left;
+  }
+}
+/* The tennis story leaves a trail to the easter egg. */
+.place-hint,
+.story-hint {
+  font:
+    0.75rem/1.7 var(--font-mono),
+    monospace;
+  color: #4c5a46;
+  background: #e4f45a26;
+  border: 1px dashed #9db35f66;
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.place-hint {
+  margin: 16px 0 0;
+}
+.story-hint {
+  margin: 35px 0 0;
+}

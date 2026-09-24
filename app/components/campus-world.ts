@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { tennisRoster, type TennisIdentity } from "./tennis-roster";
 
 export const landmarks = [
   { slug: "los-altos-high-school", label: "School", position: [-5, 3.8, -3.7] },
@@ -14,6 +15,7 @@ export const landmarks = [
 ] as const;
 
 /** Original low-poly geometry. No downloaded models or reference-site assets. */
+export type Campus = ReturnType<typeof createCampus>;
 export function createCampus() {
   const world = new THREE.Group();
   const materials = new Map<string, THREE.MeshStandardMaterial>();
@@ -162,50 +164,117 @@ export function createCampus() {
 
   // Tennis: doubles lines, mesh net, floodlights, bleachers, and a rally.
   const tennis = groups.get("varsity-tennis")!;
-  box(8.2, 0.15, 6.2, "#c4d86b", 4.6, 0.18, 4.6, tennis);
-  box(7.2, 0.025, 5.2, "#497f76", 4.6, 0.27, 4.6, tennis);
-  box(6.4, 0.03, 4.4, "#658ba2", 4.6, 0.29, 4.6, tennis);
+  const court = {
+    surround: "#c4d86b", // lime run-off, echoing the site's selected accent
+    apron: "#497f76", // dark teal band framing the playable surface
+    surface: "#658ba2", // slate-blue in-bounds court
+    line: "#fff6df", // chalk
+    net: cream,
+    post: dark,
+    ball: "#e5f164",
+  };
+  box(8.2, 0.15, 6.2, court.surround, 4.6, 0.18, 4.6, tennis);
+  box(7.2, 0.025, 5.2, court.apron, 4.6, 0.27, 4.6, tennis);
+  box(6.4, 0.03, 4.4, court.surface, 4.6, 0.29, 4.6, tennis);
   const line = (w: number, d: number, x: number, z: number) =>
-    box(w, 0.018, d, "#fff6df", x, 0.315, z, tennis);
-  for (const z of [2.4, 2.95, 6.25, 6.8]) line(6.4, 0.045, 4.6, z);
-  for (const x of [1.4, 7.8]) line(0.045, 4.4, x, 4.6);
-  for (const x of [3, 6.2]) line(0.045, 3.3, x, 4.6);
-  line(3.2, 0.045, 4.6, 4.6);
-  for (const z of [2.2, 7]) cylinder(0.045, 0.9, dark, 4.6, 0.72, z, tennis);
-  box(0.045, 0.055, 4.8, cream, 4.6, 1.16, 4.6, tennis);
+    box(w, 0.018, d, court.line, x, 0.315, z, tennis);
+  for (const z of [2.4, 2.95, 6.25, 6.8]) line(6.4, 0.045, 4.6, z); // doubles & tram lines
+  for (const x of [1.4, 7.8]) line(0.045, 4.4, x, 4.6); // baselines
+  for (const x of [3, 6.2]) line(0.045, 3.3, x, 4.6); // service lines
+  line(3.2, 0.045, 4.6, 4.6); // center service line
+  // Net: posts, top band, mesh weave, and horizontal cords.
+  for (const z of [2.2, 7])
+    cylinder(0.045, 0.9, court.post, 4.6, 0.72, z, tennis);
+  box(0.045, 0.055, 4.8, court.net, 4.6, 1.16, 4.6, tennis);
   for (let z = 2.25; z < 7; z += 0.18)
-    box(0.018, 0.72, 0.018, dark, 4.6, 0.78, z, tennis);
+    box(0.018, 0.72, 0.018, court.post, 4.6, 0.78, z, tennis);
   for (let y = 0.45; y < 1.13; y += 0.14)
-    box(0.018, 0.015, 4.8, dark, 4.6, y, 4.6, tennis);
+    box(0.018, 0.015, 4.8, court.post, 4.6, y, 4.6, tennis);
   // Back fencing is intentionally open on the camera-facing sides.
   for (let x = 0.7; x < 8.8; x += 1.3)
-    cylinder(0.03, 1.35, dark, x, 0.85, 1.55, tennis);
+    cylinder(0.03, 1.35, court.post, x, 0.85, 1.55, tennis);
   for (let y = 0.5; y < 1.6; y += 0.27)
-    box(8, 0.018, 0.018, dark, 4.6, y, 1.55, tennis);
+    box(8, 0.018, 0.018, court.post, 4.6, y, 1.55, tennis);
   for (const x of [0.6, 8.6]) {
-    cylinder(0.055, 3.3, dark, x, 1.8, 1.5, tennis);
-    box(0.6, 0.2, 0.25, cream, x, 3.46, 1.5, tennis);
+    // Floodlight masts with little lamp heads.
+    cylinder(0.055, 3.3, court.post, x, 1.8, 1.5, tennis);
+    box(0.6, 0.2, 0.25, court.net, x, 3.46, 1.5, tennis);
   }
   for (let i = 0; i < 3; i++)
-    box(2.8, 0.16, 0.3, cream, 5.6, 0.32 + i * 0.18, 7.65 + i * 0.22, tennis);
-  function person(x: number, z: number, color: string) {
-    cylinder(0.105, 0.42, color, x, 0.7, z, tennis);
-    sphere(0.13, "#c88c61", x, 1.04, z, tennis);
-    for (const dx of [-0.065, 0.065])
-      box(0.07, 0.23, 0.09, cream, x + dx, 0.41, z, tennis);
-    const racket = mesh(
-      new THREE.TorusGeometry(0.14, 0.025, 6, 16),
-      "#e4d668",
-      x + 0.24,
-      0.74,
-      z,
-      tennis,
+    box(2.8, 0.16, 0.3, court.net, 5.6, 0.32 + i * 0.18, 7.65 + i * 0.22, tennis);
+
+  /* Players are structured rigs (legs, torso, arms, head, hair, headband,
+     and a racket hinged at the hand) so the easter egg can restyle them.
+     Each rig is built facing its local +Z, then turned toward the net. */
+  type PlayerRig = {
+    root: THREE.Group;
+    torso: THREE.Mesh;
+    head: THREE.Mesh;
+    hair: THREE.Mesh;
+    headband: THREE.Mesh;
+    arms: THREE.Mesh[];
+    legs: THREE.Mesh[];
+    racket: THREE.Group;
+    hoop: THREE.Mesh;
+  };
+  const buildPlayer = (x: number, z: number, facing: number, index: number) => {
+    const root = new THREE.Group();
+    root.position.set(x, 0, z);
+    root.rotation.y = facing;
+    root.userData.tennisPlayer = index;
+    tennis.add(root);
+    const legs = [-0.065, 0.065].map((dx) =>
+      box(0.07, 0.23, 0.09, court.net, dx, 0.41, 0, root),
     );
-    racket.rotation.y = Math.PI / 2;
-  }
-  person(2.1, 4.2, "#f0b55a");
-  person(7.2, 5.1, "#f5eee0");
-  const ball = sphere(0.095, "#e5f164", 3.2, 1, 4.6, tennis);
+    const torso = cylinder(0.105, 0.42, "#f0b55a", 0, 0.7, 0, root);
+    const arms = [
+      box(0.05, 0.24, 0.065, "#f0b55a", -0.135, 0.735, 0, root),
+      box(0.05, 0.24, 0.065, "#f0b55a", 0.135, 0.735, 0.045, root),
+    ];
+    arms[1].rotation.x = -0.35; // racket arm presented toward the net
+    const head = sphere(0.13, "#c88c61", 0, 1.04, 0, root);
+    const hair = sphere(0.138, "#33241a", 0, 1.072, -0.012, root);
+    hair.scale.set(1, 0.6, 1);
+    const headband = cylinder(0.134, 0.05, court.net, 0, 1.1, -0.005, root);
+    headband.visible = false;
+    const racket = new THREE.Group();
+    racket.position.set(0.185, 0.86, 0.14);
+    root.add(racket);
+    box(0.026, 0.15, 0.026, court.post, 0, 0.075, 0, racket); // grip
+    const hoop = mesh(
+      new THREE.TorusGeometry(0.12, 0.024, 6, 20),
+      "#e4d668",
+      0,
+      0.27,
+      0,
+      racket,
+    );
+    return { root, torso, head, hair, headband, arms, legs, racket, hoop } as PlayerRig;
+  };
+  const players = [
+    buildPlayer(2.1, 4.2, Math.PI / 2, 0), // near baseline, facing +X
+    buildPlayer(7.2, 5.1, -Math.PI / 2, 1), // far baseline, facing -X
+  ];
+  const applyIdentity = (player: PlayerRig, identity: TennisIdentity) => {
+    player.torso.material = material(identity.shirt);
+    const sleeve = material(identity.sleeveless ? identity.skin : identity.shirt);
+    player.arms.forEach((arm) => (arm.material = sleeve));
+    player.legs.forEach((leg) => (leg.material = material(identity.shorts)));
+    player.head.material = material(identity.skin);
+    player.hair.material = material(identity.hair);
+    if (identity.longHair) {
+      player.hair.scale.set(1, 0.95, 1.1);
+      player.hair.position.set(0, 1.05, -0.04);
+    } else {
+      player.hair.scale.set(1, 0.6, 1);
+      player.hair.position.set(0, 1.072, -0.012);
+    }
+    player.headband.visible = identity.headband !== null;
+    if (identity.headband)
+      player.headband.material = material(identity.headband);
+    player.hoop.material = material(identity.racket);
+  };
+  const ball = sphere(0.095, court.ball, 3.2, 1, 4.6, tennis);
 
   // Research garden: an original molecule sculpture, not a chemical model.
   const research = groups.get("advanced-student-investigation")!;
@@ -316,13 +385,30 @@ export function createCampus() {
   return {
     world,
     animate(time: number) {
+      // Rally: the ball crosses between the baselines and whichever player
+      // it reaches swings through and hops into the shot.
+      const s = Math.sin(time * 1.7);
       ball.position.set(
-        4.6 + Math.sin(time * 1.7) * 2.6,
+        4.6 + s * 2.6,
         0.5 + Math.abs(Math.cos(time * 1.7)) * 1.2,
-        4.6 + Math.sin(time * 1.7) * 0.45,
+        4.6 + s * 0.45,
       );
+      const spike = (v: number) => Math.pow(Math.max(0, v), 14);
+      const swings = [spike(-s), spike(s)]; // near player at s=-1, far at s=+1
+      players.forEach((player, i) => {
+        const w = swings[i];
+        player.racket.rotation.x = w * 1.15;
+        player.root.position.y = w * 0.05;
+      });
       molecule.rotation.y = time * 0.2;
       mathRing.rotation.y = time * 0.25;
+    },
+    /** Swap a player's look for the easter egg; index matches the roster. */
+    setIdentity(playerIndex: number, identityIndex: number) {
+      const player = players[playerIndex];
+      if (!player) return;
+      const roster = tennisRoster.length;
+      applyIdentity(player, tennisRoster.at(((identityIndex % roster) + roster) % roster)!);
     },
     dispose() {
       geometries.forEach((g) => g.dispose());

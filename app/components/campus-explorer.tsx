@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { timeline } from "../data";
+import { rosterTriggers, tennisRoster } from "./tennis-roster";
 
 const CampusScene = dynamic(() => import("./campus-scene"), {
   ssr: false,
@@ -88,6 +89,93 @@ export default function CampusExplorer() {
     return () => window.removeEventListener("keydown", escape);
   }, [selected]);
 
+  /*
+   * The court easter egg. Double-clicking a player (handled by the scene)
+   * cycles that player's identity; typing a legend's name anywhere swaps
+   * both players into their kit. "deuce" shuffles the lineup, "rishi" or
+   * "reset" hands the court back. Announcements appear as a toast.
+   */
+  const rosterLength = tennisRoster.length;
+  const [identities, setIdentities] = useState<number[]>([0, 0]);
+  const identitiesRef = useRef(identities);
+  identitiesRef.current = identities;
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(
+    null,
+  );
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const announce = useCallback((text: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ id: Date.now(), text });
+    toastTimer.current = setTimeout(() => setToast(null), 3200);
+  }, []);
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    [],
+  );
+  const serveLine = (index: number) => {
+    const identity = tennisRoster[index]!;
+    return `${identity.flag} Now serving: ${identity.name} — ${identity.tag}`;
+  };
+  const pickForCourt = useCallback(
+    (index: number) => {
+      setIdentities([index, index]);
+      announce(serveLine(index));
+    },
+    [announce],
+  );
+  const cyclePlayer = useCallback(
+    (player: number) => {
+      const next = [...identitiesRef.current];
+      next[player] = (next[player]! + 1) % rosterLength;
+      setIdentities(next);
+      announce(serveLine(next[player]!));
+    },
+    [announce, rosterLength],
+  );
+  const shuffleLineup = useCallback(() => {
+    const near = Math.floor(Math.random() * rosterLength);
+    const far = Math.floor(Math.random() * rosterLength);
+    setIdentities([near, far]);
+    announce(
+      `🎾 Deuce! ${tennisRoster[near]!.name} vs ${tennisRoster[far]!.name} — what a final`,
+    );
+  }, [announce, rosterLength]);
+  const typed = useRef("");
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.isContentEditable ||
+          /^(input|textarea|select)$/i.test(target.tagName))
+      )
+        return;
+      if (event.key.length !== 1) return;
+      typed.current = (typed.current + event.key.toLowerCase()).slice(-12);
+      const triggers: ReadonlyArray<readonly [string, () => void]> = [
+        ["deuce", shuffleLineup],
+        ["rishi", () => pickForCourt(0)],
+        ["reset", () => pickForCourt(0)],
+        ...Object.entries(rosterTriggers).map(
+          ([name, index]) =>
+            [name, () => pickForCourt(index)] as const,
+        ),
+      ];
+      for (const [word, action] of triggers) {
+        if (typed.current.endsWith(word)) {
+          typed.current = "";
+          action();
+          return;
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pickForCourt, shuffleLineup]);
+
   return (
     <section className="campus" aria-label="Explore Rishi’s world">
       <div className="campus-view">
@@ -117,8 +205,15 @@ export default function CampusExplorer() {
             selected={selected}
             onSelect={selectPlace}
             paused={paused}
+            identities={identities}
+            onPlayerCycle={cyclePlayer}
           />
         </div>
+        {toast && (
+          <p key={toast.id} className="court-toast" role="status">
+            {toast.text}
+          </p>
+        )}
         {item && (
           <aside className="place-card" aria-label={`${item.title} preview`}>
             <button
@@ -138,6 +233,7 @@ export default function CampusExplorer() {
               {item.role} · {item.organization}
             </p>
             <p>{item.summary}</p>
+            {item.hint && <p className="place-hint">{item.hint}</p>}
             <Link className="story-link" href={`/timeline/${item.slug}`}>
               Explore this chapter <span>↗</span>
             </Link>
