@@ -55,13 +55,43 @@ a:hover {
 .skip-link:focus {
   transform: none;
 }
+/*
+ * The campus is a tall scroll runway. The viewport-sized .campus-view is
+ * pinned while the section scrolls past, and that scroll progress drives
+ * the camera flight in campus-scene (anime.js ScrollObserver sync style).
+ * overflow-x: clip contains the off-grid stage without breaking sticky,
+ * which overflow: hidden would do.
+ */
 .campus {
   position: relative;
-  min-height: 860px;
-  height: 100svh;
-  max-height: 1250px;
-  overflow: hidden;
+  height: 240vh;
+  height: 240svh;
+  overflow-x: clip;
   background: transparent;
+}
+.campus-view {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: clip;
+}
+/* Visitors who cannot fly (no WebGL, reduced motion, no scripting) get the
+   original single-screen flow back instead of three screens of dead runway. */
+.campus.no-flight {
+  height: auto;
+}
+.campus.no-flight .campus-view {
+  position: relative;
+  height: auto;
+  min-height: 860px;
+}
+/* Pre-Safari-16 has no overflow: clip; hidden on html contains the off-grid
+   stage while keeping the viewport the sticky scroll container. */
+@supports not (overflow: clip) {
+  html {
+    overflow-x: hidden;
+  }
 }
 .site-header {
   position: absolute;
@@ -111,6 +141,11 @@ a:hover {
   top: 155px;
   z-index: 2;
   pointer-events: none;
+  /* --flight (0→1) is written by the scroll choreography; the heading
+     dissolves and lifts away as the camera takes over. */
+  opacity: clamp(0, calc(1 - var(--flight, 0) * 3.2), 1);
+  transform: translate3d(0, calc(var(--flight, 0) * -64px), 0);
+  will-change: opacity, transform;
 }
 .world-intro a {
   pointer-events: auto;
@@ -150,12 +185,23 @@ a:hover {
   gap: 20px;
   padding-top: 15px;
 }
+/*
+ * The stage opens from its beside-the-heading inset framing to full bleed
+ * as the flight begins: --open tracks the first stretch of --flight, so the
+ * campus fills the whole screen by the time the heading has dissolved.
+ * Responsive breakpoints retune the closed insets via --stage-* variables.
+ */
 .world-stage {
+  --stage-top: 95px;
+  --stage-bottom: 118px;
+  --stage-left: 22%;
+  --stage-right: -8%;
+  --open: clamp(0, calc(var(--flight, 0) * 3.5), 1);
   position: absolute;
-  top: 95px;
-  bottom: 118px;
-  left: 22%;
-  right: -8%;
+  top: calc(var(--stage-top) * (1 - var(--open)));
+  bottom: calc(var(--stage-bottom) * (1 - var(--open)));
+  left: calc(var(--stage-left) * (1 - var(--open)));
+  right: calc(var(--stage-right) * (1 - var(--open)));
 }
 .campus-canvas {
   width: 100%;
@@ -290,6 +336,54 @@ a:hover {
   color: var(--muted);
   margin: 0;
 }
+/* Quiet invitation to start the scroll flight; fades out as --flight rises. */
+.scroll-cue {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%);
+  z-index: 3;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font:
+    500 0.68rem/1 var(--font-mono),
+    monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+  opacity: clamp(0, calc(1 - var(--flight, 0) * 9), 1);
+}
+.scroll-cue i {
+  position: relative;
+  width: 1px;
+  height: 32px;
+  overflow: hidden;
+  background: #94a3b455;
+}
+.scroll-cue i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -45%;
+  width: 100%;
+  height: 45%;
+  background: var(--accent);
+  animation: cue-fall 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cue-fall {
+  to {
+    top: 115%;
+  }
+}
+@media (min-width: 701px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .scroll-cue {
+    display: flex;
+  }
+}
 .chapter-dock {
   display: flex;
   background: #fffffffa;
@@ -418,6 +512,21 @@ footer h2 em {
 .timeline {
   max-width: 1050px;
   margin: auto;
+}
+/* Staggered anime-style spring reveals. The hidden state lives only under
+   .js-reveals, added by script when motion is welcome, so no-JS readers and
+   reduced-motion visitors always see every story in place. */
+.js-reveals .reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 38px, 0) scale(0.985);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: min(calc(var(--reveal-i, 0) * 75ms), 450ms);
+}
+.js-reveals .reveal-item.reveal-in {
+  opacity: 1;
+  transform: none;
 }
 .timeline-card {
   display: grid;
@@ -576,8 +685,8 @@ footer > a {
 }
 @media (min-width: 1600px) {
   .world-stage {
-    left: 20%;
-    right: -3%;
+    --stage-left: 20%;
+    --stage-right: -3%;
   }
   .world-intro {
     top: 19%;
@@ -591,10 +700,10 @@ footer > a {
     top: 135px;
   }
   .world-stage {
-    left: 13%;
-    right: -17%;
-    top: 160px;
-    bottom: 140px;
+    --stage-left: 13%;
+    --stage-right: -17%;
+    --stage-top: 160px;
+    --stage-bottom: 140px;
   }
   .world-intro h1 {
     font-size: 4rem;
@@ -628,6 +737,21 @@ footer > a {
     height: auto;
     min-height: 1040px;
     max-height: none;
+  }
+  /* Phones keep the in-flow layout; the flight simply scrubs as the
+     section passes through the viewport. A pinned taller-than-screen
+     view would hide the dock on short devices. */
+  .campus-view {
+    position: static;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .campus.no-flight .campus-view {
+    position: static;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
   .site-header {
     height: 80px;
@@ -791,6 +915,22 @@ footer > a {
   *:after {
     transition: none !important;
     animation: none !important;
+  }
+  /* Belt and braces: reveals never hide content when motion is reduced. */
+  .js-reveals .reveal-item {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Reduced motion also skips the pinned runway: plain single-screen flow. */
+@media (prefers-reduced-motion: reduce) and (min-width: 701px) {
+  .campus {
+    height: auto;
+  }
+  .campus-view {
+    position: relative;
+    height: auto;
+    min-height: 860px;
   }
 }
 

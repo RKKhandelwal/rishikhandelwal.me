@@ -25,6 +25,12 @@ White surfaces, near-black text, thin neutral borders, modest corner radii, and 
 
 Drag with a mouse to orbit the campus freely through 360 degrees and tilt from pole to pole. Releasing the pointer lets the view coast smoothly to a stop; reduced-motion preferences disable this inertia. Mouse-wheel and touch scrolling remain available for the page. On touch devices the scene stays framed and its buttons/dock provide story selection. Ambient animation respects the operating system's reduced-motion preference. Selecting a story moves keyboard focus to its preview; Escape/Close restores the trigger.
 
+## Scroll flight
+
+The homepage is choreographed anime.js-ScrollObserver-style: on fine-pointer viewports above 700px wide the campus section becomes a 240svh scroll runway whose pinned `.campus-view` is scrubbed through a keyframed camera path (`FLIGHT_KEYS` in `campus-scene.tsx`). One full pass around the world plays over the runway — dipping from the opening pose to a low angle near the landmarks, then rising to a wide pull-out as the timeline arrives. Keys are evenly spaced and sampled with a Catmull-Rom spline so angular velocity stays continuous through the joints; scroll progress eases toward the live position with frame-rate-normalized damping, so wheel steps read as one continuous glide. As the flight opens, the stage itself blooms from its beside-the-heading inset framing to full bleed (driven by the shared `--flight` custom property) while the heading and scroll cue dissolve; the timeline headings and story cards then rise in with staggered spring-style reveals (`reveal.tsx`, IntersectionObserver, `--reveal-i` delays). A pointer drag owns the camera; resuming the scroll eases back onto the path along the shortest arc instead of cutting.
+
+When the flight cannot run — reduced motion, missing WebGL, a lost context, coarse pointers, or scripting disabled — the runway collapses to the original single-screen flow (`no-flight` class, media queries, and a `<noscript>` style), the heading and cue stay fully visible, and reveals never hide content.
+
 The scene is dynamically imported only on the client. Renderer pixel density is capped, and animation rendering stops while offscreen, hidden, or reduced motion is enabled. Meshes, materials, controls, observers, listeners, the shadow map, and the renderer are disposed on unmount. Devices without WebGL get an explanatory message and can still access every story through the dock and ordinary links.
 
 ## Local development

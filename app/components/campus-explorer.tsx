@@ -90,71 +90,87 @@ export default function CampusExplorer() {
 
   return (
     <section className="campus" aria-label="Explore Rishi’s world">
-      <div className="world-intro">
-        <h1>
-          Rishi
-          <br />
-          <em>Khandelwal.</em>
-        </h1>
-        <p>
-          A student. A teammate. A curious mind.
-          <br />A few places that have shaped me.
-        </p>
-      </div>
-      <div className="world-stage">
-        <CampusScene
-          selected={selected}
-          onSelect={selectPlace}
-          paused={paused}
-        />
-      </div>
-      {item && (
-        <aside className="place-card" aria-label={`${item.title} preview`}>
-          <button
-            className="close-card"
-            aria-label="Close story preview"
-            onClick={closePreview}
-          >
-            ×
-          </button>
-          <p className="eyebrow">
-            {item.period} <span> / {item.date}</span>
+      <div className="campus-view">
+        <noscript>
+          <style>{`
+            .campus { height: auto; }
+            .campus-view { position: relative; height: auto; min-height: 860px; }
+            .scroll-cue { display: none; }
+            @media (max-width: 700px) {
+              .campus-view { position: static; min-height: 0; overflow: visible; }
+            }
+          `}</style>
+        </noscript>
+        <div className="world-intro">
+          <h1>
+            Rishi
+            <br />
+            <em>Khandelwal.</em>
+          </h1>
+          <p>
+            A student. A teammate. A curious mind.
+            <br />A few places that have shaped me.
           </p>
-          <h2 ref={previewHeading} tabIndex={-1}>
-            {item.title}
-          </h2>
-          <p className="place-role">
-            {item.role} · {item.organization}
-          </p>
-          <p>{item.summary}</p>
-          <Link className="story-link" href={`/timeline/${item.slug}`}>
-            Explore this chapter <span>↗</span>
-          </Link>
-        </aside>
-      )}
-      <div className="world-bottom">
-        <nav ref={dock} className="chapter-dock" aria-label="Campus stories">
-          <span
-            className="dock-selection"
-            aria-hidden="true"
-            style={{
-              width: pill.width,
-              height: pill.height,
-              transform: `translate3d(${pill.x}px, ${pill.y}px, 0)`,
-              opacity: selected && pill.width ? 1 : 0,
-            }}
+        </div>
+        <div className="world-stage">
+          <CampusScene
+            selected={selected}
+            onSelect={selectPlace}
+            paused={paused}
           />
-          {timeline.map((item, i) => (
+        </div>
+        {item && (
+          <aside className="place-card" aria-label={`${item.title} preview`}>
             <button
-              key={item.slug}
-              className={selected === item.slug ? "selected" : ""}
-              aria-pressed={selected === item.slug}
-              onClick={() => selectPlace(item.slug)}
+              className="close-card"
+              aria-label="Close story preview"
+              onClick={closePreview}
             >
-              {chapters[i]}
+              ×
             </button>
-          ))}
-        </nav>
+            <p className="eyebrow">
+              {item.period} <span> / {item.date}</span>
+            </p>
+            <h2 ref={previewHeading} tabIndex={-1}>
+              {item.title}
+            </h2>
+            <p className="place-role">
+              {item.role} · {item.organization}
+            </p>
+            <p>{item.summary}</p>
+            <Link className="story-link" href={`/timeline/${item.slug}`}>
+              Explore this chapter <span>↗</span>
+            </Link>
+          </aside>
+        )}
+        <div className="world-bottom">
+          <nav ref={dock} className="chapter-dock" aria-label="Campus stories">
+            <span
+              className="dock-selection"
+              aria-hidden="true"
+              style={{
+                width: pill.width,
+                height: pill.height,
+                transform: `translate3d(${pill.x}px, ${pill.y}px, 0)`,
+                opacity: selected && pill.width ? 1 : 0,
+              }}
+            />
+            {timeline.map((item, i) => (
+              <button
+                key={item.slug}
+                className={selected === item.slug ? "selected" : ""}
+                aria-pressed={selected === item.slug}
+                onClick={() => selectPlace(item.slug)}
+              >
+                {chapters[i]}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <p className="scroll-cue" aria-hidden="true">
+          <span>Keep scrolling — the campus flies</span>
+          <i />
+        </p>
       </div>
     </section>
   );

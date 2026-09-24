@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { timeline } from "./data";
 import CampusExplorer from "./components/campus-explorer";
+import Reveal from "./components/reveal";
 
 export default function Home() {
   return (
@@ -10,7 +11,7 @@ export default function Home() {
       </a>
       <CampusExplorer />
       <section id="timeline" className="timeline-section">
-        <div className="section-heading">
+        <Reveal className="section-heading">
           <h2>
             Different places.
             <br />
@@ -20,8 +21,8 @@ export default function Home() {
             On the court, in the classroom, and somewhere between a question and
             an answer. Here&apos;s the path so far.
           </p>
-        </div>
-        <div className="timeline">
+        </Reveal>
+        <Reveal className="timeline">
           {timeline.map((item) => (
             <article className={`timeline-card ${item.color}`} key={item.slug}>
               <div className="card-copy">
@@ -45,7 +46,7 @@ export default function Home() {
               </Link>
             </article>
           ))}
-        </div>
+        </Reveal>
       </section>
       <footer>
         <h2>
