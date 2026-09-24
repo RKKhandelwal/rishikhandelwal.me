@@ -54,7 +54,7 @@ export default function Home() {
           <br />
           <em>something curious.</em>
         </h2>
-        <a href="mailto:rkrishikhandelewal@gmail.com">Say hello ↗</a>
+        <a href="mailto:rkrishikhandelwal@gmail.com">Say hello ↗</a>
         <div className="footer-bottom">
           <span>Rishi Khandelwal</span>
         </div>
