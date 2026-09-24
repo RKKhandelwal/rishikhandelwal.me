@@ -233,12 +233,15 @@ export function createCampus() {
     ];
     arms[1].rotation.x = -0.35; // racket arm presented toward the net
     const head = sphere(0.13, "#c88c61", 0, 1.04, 0, root);
-    const hair = sphere(0.138, "#33241a", 0, 1.072, -0.012, root);
-    hair.scale.set(1, 0.6, 1);
-    const headband = cylinder(0.134, 0.05, court.net, 0, 1.1, -0.005, root);
+    // Hair is a slightly larger shell nudged up and back from the skull:
+    // it hugs over the crown and occiput while the face stays bare.
+    const hair = sphere(0.142, "#33241a", 0, 1.07, -0.035, root);
+    // A touch wider than the hair so a headband wraps visibly over it.
+    const headband = cylinder(0.146, 0.05, court.net, 0, 1.095, -0.035, root);
     headband.visible = false;
     const racket = new THREE.Group();
-    racket.position.set(0.185, 0.86, 0.14);
+    // Gripped at the racket arm's hand (arm bottom ~y 0.63), head up front.
+    racket.position.set(0.145, 0.635, 0.1);
     root.add(racket);
     box(0.026, 0.15, 0.026, court.post, 0, 0.075, 0, racket); // grip
     const hoop = mesh(
@@ -249,6 +252,12 @@ export function createCampus() {
       0,
       racket,
     );
+    // Invisible, generous hit volume so the easter egg stays easy to
+    // double-click while the players are on the move.
+    const hitbox = cylinder(0.45, 1.5, court.post, 0, 0.7, 0, root);
+    hitbox.visible = false;
+    hitbox.castShadow = false;
+    hitbox.receiveShadow = false;
     return { root, torso, head, hair, headband, arms, legs, racket, hoop } as PlayerRig;
   };
   const players = [
@@ -263,11 +272,12 @@ export function createCampus() {
     player.head.material = material(identity.skin);
     player.hair.material = material(identity.hair);
     if (identity.longHair) {
-      player.hair.scale.set(1, 0.95, 1.1);
-      player.hair.position.set(0, 1.05, -0.04);
+      // Fuller mop: grows down to the nape and back past the skull.
+      player.hair.scale.set(1, 1.05, 1.18);
+      player.hair.position.set(0, 1.05, -0.06);
     } else {
-      player.hair.scale.set(1, 0.6, 1);
-      player.hair.position.set(0, 1.072, -0.012);
+      player.hair.scale.set(1, 1, 1);
+      player.hair.position.set(0, 1.07, -0.035);
     }
     player.headband.visible = identity.headband !== null;
     if (identity.headband)
@@ -275,6 +285,53 @@ export function createCampus() {
     player.hoop.material = material(identity.racket);
   };
   const ball = sphere(0.095, court.ball, 3.2, 1, 4.6, tennis);
+
+  /* Rally simulation — a tiny state machine, not a canned sine loop.
+     Each shot leaves a player's racket and lands on a fresh random spot in
+     the receiver's court. The receiver sprints to that spot and answers,
+     so the pair trade deeper and shorter balls, come to the net, recover,
+     and time their swings as the ball arrives. Flight time is derived from
+     how far the receiver must run, so ball and player land together. */
+  const rally = {
+    striker: 0, // who just hit the ball
+    prev: -1, // previous animate() time, for a frame-rate-free dt
+    t: 0, // seconds elapsed on the current shot
+    duration: 1,
+    arc: 1,
+    from: new THREE.Vector3(), // racket contact point (frozen for the flight)
+    land: new THREE.Vector3(), // where the ball bounces / receiver will be
+    recvStart: new THREE.Vector3(), // receiver position when the shot began
+    started: false,
+  };
+  const home = [
+    new THREE.Vector3(2.1, 0, 4.6), // near baseline center
+    new THREE.Vector3(7.2, 0, 4.6), // far baseline center
+  ];
+  const lerp = THREE.MathUtils.lerp;
+  const contactPoint = (player: number, target: THREE.Vector3) => {
+    const p = players[player].root.position;
+    target.set(p.x + (player === 0 ? 0.42 : -0.42), 0.72, p.z);
+    return target;
+  };
+  const startShot = (striker: number) => {
+    const receiver = 1 - striker;
+    rally.striker = striker;
+    contactPoint(striker, rally.from);
+    const r = players[receiver].root.position;
+    rally.recvStart.set(r.x, 0, r.z);
+    const [minX, maxX] = receiver === 1 ? [5.1, 7.35] : [1.85, 4.05];
+    rally.land.set(
+      lerp(minX, maxX, Math.random()),
+      0,
+      lerp(2.7, 6.5, Math.random()),
+    );
+    // Run distance sets the pace: sprint for a wide ball, jog for one served
+    // straight to the racket, so rallies breathe instead of metronoming.
+    const run = Math.hypot(rally.land.x - r.x, rally.land.z - r.z);
+    rally.duration = THREE.MathUtils.clamp(0.55 + run * 0.32, 0.72, 1.6);
+    rally.arc = lerp(0.8, 1.25, Math.random()) + run * 0.12;
+    rally.t = 0;
+  };
 
   // Research garden: an original molecule sculpture, not a chemical model.
   const research = groups.get("advanced-student-investigation")!;
@@ -385,21 +442,67 @@ export function createCampus() {
   return {
     world,
     animate(time: number) {
-      // Rally: the ball crosses between the baselines and whichever player
-      // it reaches swings through and hops into the shot.
-      const s = Math.sin(time * 1.7);
-      ball.position.set(
-        4.6 + s * 2.6,
-        0.5 + Math.abs(Math.cos(time * 1.7)) * 1.2,
-        4.6 + s * 0.45,
-      );
-      const spike = (v: number) => Math.pow(Math.max(0, v), 14);
-      const swings = [spike(-s), spike(s)]; // near player at s=-1, far at s=+1
-      players.forEach((player, i) => {
-        const w = swings[i];
-        player.racket.rotation.x = w * 1.15;
-        player.root.position.y = w * 0.05;
-      });
+      // Advance the rally by real elapsed time so it plays identically at
+      // any frame rate; the first call just primes the clock.
+      const dt = rally.prev < 0 ? 0 : Math.min(time - rally.prev, 0.05);
+      rally.prev = time;
+      if (!rally.started) {
+        rally.started = true;
+        startShot(0);
+        ball.position.copy(rally.from);
+      } else {
+        rally.t += dt;
+        // A hard frame hitch (tab hidden) can skip a full shot; just resume
+        // mid-rally rather than fast-forwarding through many hits.
+        let guard = 2;
+        while (rally.t >= rally.duration && guard-- > 0) {
+          const runner = players[1 - rally.striker];
+          runner.root.position.copy(rally.land);
+          startShot(1 - rally.striker);
+        }
+        const u = THREE.MathUtils.clamp(rally.t / rally.duration, 0, 1);
+        const receiver = 1 - rally.striker;
+        // Turn only when there is a real direction to aim at (a player the
+        // ball flies directly over would otherwise snap toward atan2(0,0)).
+        const face = (rig: THREE.Object3D, x: number, z: number) => {
+          const dx = x - rig.position.x;
+          const dz = z - rig.position.z;
+          if (dx * dx + dz * dz > 0.014) rig.rotation.y = Math.atan2(dx, dz);
+        };
+        // Ball: parabola from the striker's strings down to the landing spot.
+        ball.position.set(
+          lerp(rally.from.x, rally.land.x, u),
+          lerp(rally.from.y, 0.12, u) + rally.arc * Math.sin(Math.PI * u),
+          lerp(rally.from.z, rally.land.z, u),
+        );
+        // Receiver: ease onto the ball (fast away from a bad position,
+        // settling as the racket arrives), tracking it and winding up late.
+        const chase = 1 - (1 - u) * (1 - u);
+        const runner = players[receiver].root;
+        runner.position.x = lerp(rally.recvStart.x, rally.land.x, chase);
+        runner.position.z = lerp(rally.recvStart.z, rally.land.z, chase);
+        face(runner, ball.position.x, ball.position.z);
+        const windup = Math.max(0, (u - 0.72) / 0.28);
+        players[receiver].racket.rotation.x = -0.15 + windup * windup * 0.5;
+        runner.position.y *= Math.exp(-6 * dt);
+        // Striker: swings through contact, then recovers toward the middle
+        // with the racket easing back to the ready position.
+        const hitter = players[rally.striker].root;
+        const swing = Math.max(0, 1 - u * 2.6);
+        face(hitter, ball.position.x, ball.position.z);
+        players[rally.striker].racket.rotation.x = -0.15 - swing * 1.2;
+        hitter.position.y = swing * 0.06;
+        hitter.position.x = lerp(
+          hitter.position.x,
+          home[rally.striker].x,
+          dt * 1.4,
+        );
+        hitter.position.z = lerp(
+          hitter.position.z,
+          home[rally.striker].z,
+          dt * 1.4,
+        );
+      }
       molecule.rotation.y = time * 0.2;
       mathRing.rotation.y = time * 0.25;
     },

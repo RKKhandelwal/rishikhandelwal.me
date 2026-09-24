@@ -11,7 +11,7 @@ This implementation uses Three.js directly with an orthographic camera, soft dir
 - **School:** a blue-roofed hall and clock tower.
 - **Community:** a shared learning table, books, and benches.
 - **Aviation:** a miniature biplane on a museum apron.
-- **Tennis:** doubles and service lines, net, lights, bleachers, and two structured player rigs rallying — each swings and hops as the ball arrives.
+- **Tennis:** doubles and service lines, net, lights, bleachers, and two structured player rigs playing an unscripted rally — every shot flies to a random spot in the receiver's court, flight time is derived from the run distance so ball and player arrive together, and each swings, hops, turns, and recovers between the lines.
 - **Mathematics:** a book pavilion and rotating ring.
 - **Research:** a lab and abstract molecule sculpture (decorative, not a scientific model).
 
