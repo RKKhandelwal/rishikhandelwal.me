@@ -13,6 +13,7 @@ export type TimelineItem = {
   detail: string;
   highlights: string[];
   hint?: string;
+  callout?: string;
   link?: string;
   linkLabel?: string;
   highlightsTitle?: string;
@@ -49,6 +50,7 @@ export const timeline: TimelineItem[] = [
   },
   {
     "slug": "courtbook",
+    "callout": "Pending publication in the Los Altos Crier.",
     "date": "GRADES 10–11 → NOW",
     "period": "Technology & Community",
     "title": "CourtBook, LLC",
