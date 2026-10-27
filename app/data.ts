@@ -64,7 +64,7 @@ export const timeline: TimelineItem[] = [
   {
     "slug": "courtbook",
     "callout": "Pending publication in the Los Altos Crier.",
-    "date": "GRADES 10–11 → NOW",
+    "date": "GRADES 11 → NOW",
     "period": "Technology & Community",
     "title": "CourtBook, LLC",
     "role": "Founder & Developer",
@@ -77,11 +77,11 @@ export const timeline: TimelineItem[] = [
     "imageCredit": "KeepActive Australia, CC BY-SA 4.0, via Wikimedia Commons",
     "imageCreditUrl": "https://commons.wikimedia.org/wiki/File:Empty_clay_tennis_court_in_Melbourne_Australia_looking_down_the_middle.jpg",
     "summary": "Turning the search for an open tennis court into a computer-vision project with the City of Los Altos.",
-    "detail": "I founded CourtBook, LLC to help communities understand how their courts are used. I built a computer-vision platform and weatherproof camera system for real-time court occupancy data, and have been collaborating with the Los Altos Recreation Department, including Manny Hernandez and Jaime Chew, on court usage data services. The work has grown from a McKenzie Court dashboard proposal into equipment preparation and discussions about service scope, installation, and privacy.",
+    "detail": "I founded CourtBook, LLC to help communities understand how their courts are used. I built a computer-vision platform and weatherproof camera system for real-time court occupancy data, and after piloting with the Los Altos Parks and Recreation Department — including work with Manny Hernandez and Jaime Chew — we are moving forward with six parks and recreation departments on court usage data services. The work has grown from a McKenzie Court dashboard proposal into equipment preparation and discussions about service scope, installation, and privacy.",
     "highlightsTitle": "Building with the community",
     "highlights": [
         "Developed a computer-vision platform and weatherproof camera system",
-        "Collaborating with Los Altos staff on court usage data services",
+        "Moving forward with six parks and recreation departments on court usage data services",
         "Prepared equipment for the agreed courts while coordinating approval and installation",
         "Designed the proposed service around occupancy data and numerical analysis, with no stored video"
     ]
