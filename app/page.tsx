@@ -36,6 +36,7 @@ export default function Home() {
                   {item.role} · {item.organization}
                 </p>
                 <p className="summary">{item.summary}</p>
+                {item.callout && <aside className="publication-callout">{item.callout}</aside>}
               </div>
               <Link
                 href={`/timeline/${item.slug}`}

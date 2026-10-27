@@ -1326,3 +1326,14 @@ body > main {
 }
 
 .activity-star { color: #856000; white-space: nowrap; font-size: 0.75em; }
+
+.publication-callout {
+  margin: 1.25rem 0;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid #856000;
+  border-radius: 0 8px 8px 0;
+  background: #fff2cc;
+  color: #514019;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
