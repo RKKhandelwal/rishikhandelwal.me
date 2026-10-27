@@ -14,14 +14,14 @@ const CampusScene = dynamic(() => import("./campus-scene"), {
     </div>
   ),
 });
-const chapters = [
-  "School",
-  "Community",
-  "Aviation",
-  "Tennis",
-  "Mathematics",
-  "Research",
-];
+const chapters: Record<string, string> = {
+  "los-altos-high-school": "School",
+  "buddies4math": "Community",
+  "hiller-aviation": "Aviation",
+  "varsity-tennis": "Tennis",
+  "promys": "Mathematics",
+  "advanced-student-investigation": "Research",
+};
 
 export default function CampusExplorer() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -251,14 +251,14 @@ export default function CampusExplorer() {
                 opacity: selected && pill.width ? 1 : 0,
               }}
             />
-            {timeline.filter((item) => item.campus !== false).map((item, i) => (
+            {timeline.filter((item) => item.campus !== false).map((item) => (
               <button
                 key={item.slug}
                 className={selected === item.slug ? "selected" : ""}
                 aria-pressed={selected === item.slug}
                 onClick={() => selectPlace(item.slug)}
               >
-                {chapters[i]}
+                {chapters[item.slug]}
               </button>
             ))}
           </nav>
