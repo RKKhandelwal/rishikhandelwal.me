@@ -23,14 +23,14 @@ export default function Home() {
           </p>
         </Reveal>
         <Reveal className="timeline">
-          {timeline.map((item) => (
+          {timeline.map((item, index) => (
             <article className={`timeline-card ${item.color}`} key={item.slug}>
               <div className="card-copy">
                 <p className="date">
                   {item.date} <span> / {item.period}</span>
                 </p>
                 <h3>
-                  <Link href={`/timeline/${item.slug}`}>{item.title}</Link>
+                  <Link href={`/timeline/${item.slug}`}>{item.title}</Link>{index < 3 && <span className="activity-star" role="img" aria-label="Top three activity"> ★</span>}
                 </h3>
                 <p className="role">
                   {item.role} · {item.organization}

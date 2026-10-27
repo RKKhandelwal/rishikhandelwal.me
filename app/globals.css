@@ -1324,3 +1324,5 @@ body > main {
 .story-hint {
   margin: 35px 0 0;
 }
+
+.activity-star { color: #856000; white-space: nowrap; font-size: 0.75em; }
