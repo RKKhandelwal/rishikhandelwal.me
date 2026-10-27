@@ -14,6 +14,9 @@ export type TimelineItem = {
   highlights: string[];
   hint?: string;
   link?: string;
+  linkLabel?: string;
+  highlightsTitle?: string;
+  campus?: boolean;
 };
 
 export const timeline: TimelineItem[] = [
@@ -34,5 +37,29 @@ export const timeline: TimelineItem[] = [
   },
   {
     slug: "advanced-student-investigation", date: "AUG 2025 → NOW", period: "Research", title: "Advanced Student Investigation", role: "Student Attendee", organization: "ASI", icon: "⌬", color: "pink", image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1200&q=85", alt: "Scientist working in a laboratory", summary: "Following a molecule-sized question through chemical engineering, data analysis, and a research poster.", detail: "In ASI, I am learning chemical engineering and data analysis in a 36-week program. With mentorship from Stanford assistant professor Andy Tsai, I am developing research on in-silico design targeting TREM2.", highlights: ["36-week chemical engineering and data analysis program", "Research: Targeting TREM2: In Silico Design of a Small Molecule Agonist", "Formatted findings into a poster and presented at SYNOPSYS"], link: "https://science-fair.org/",
+  },
+  {
+    slug: "why-feature-scaling-works",
+    date: "SEP 28, 2026",
+    period: "Publication",
+    title: "Why Feature Scaling Works",
+    role: "Author",
+    organization: "The Oxford Journal of Student Scholarship",
+    icon: "∇",
+    color: "mint",
+    campus: false,
+    image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1200&q=85",
+    alt: "Mathematical equations on a chalkboard",
+    summary: "My published paper explores how feature scaling shapes the path gradient descent takes toward a solution.",
+    detail: "In Why Feature Scaling Works: Condition Number as the Key to Gradient Descent Convergence, I study how the condition number of the Hessian helps explain why scaling choices affect convergence. The paper compares standardisation, min-max scaling, robust scaling, and PCA whitening through experiments with different dataset sizes and feature imbalances.",
+    highlightsTitle: "About the paper",
+    highlights: [
+      "Published September 28, 2026 · Volume 11, Issue 6",
+      "Connects feature scaling, numerical conditioning, and gradient descent convergence",
+      "Examines the limits of whitening when data contains outliers",
+      "DOI: 10.65161/recxYS7FqdJd63gJy",
+    ],
+    link: "https://www.oxfordjss.org/sep-2026-vol-11-issue-6/why-feature-scaling-works-condition-number-as-the-key-to-gradient-descent-convergence",
+    linkLabel: "READ THE PAPER",
   },
 ];

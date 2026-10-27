@@ -251,7 +251,7 @@ export default function CampusExplorer() {
                 opacity: selected && pill.width ? 1 : 0,
               }}
             />
-            {timeline.map((item, i) => (
+            {timeline.filter((item) => item.campus !== false).map((item, i) => (
               <button
                 key={item.slug}
                 className={selected === item.slug ? "selected" : ""}
