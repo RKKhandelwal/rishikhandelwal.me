@@ -215,7 +215,10 @@ export default function CampusExplorer() {
           </p>
         )}
         {item && (
-          <aside className="place-card" aria-label={`${item.title} preview`}>
+          <aside
+            className={`place-card ${item.color}`}
+            aria-label={`${item.title} preview`}
+          >
             <button
               className="close-card"
               aria-label="Close story preview"

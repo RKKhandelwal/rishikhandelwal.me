@@ -101,16 +101,15 @@ export function createCampus() {
   const school = groups.get("los-altos-high-school")!;
   box(4.6, 1.9, 2.8, cream, -6, 1.08, -4.4, school);
   box(4.95, 0.25, 3.1, orange, -6, 2.15, -4.4, school);
-  const roof = mesh(
-    new THREE.CylinderGeometry(0, 1, 1, 4),
-    orange,
-    -6,
-    2.6,
-    -4.4,
-    school,
-  );
-  roof.rotation.y = Math.PI / 4;
-  roof.scale.set(3.5, 0.9, 2.2);
+  /* The pyramid's base is spun 45° *inside the geometry* so its corners
+     land over the hall's corners. Rotating the mesh instead would skew it:
+     three.js applies an object's scale before its rotation, so the
+     non-uniform (3.5, 0.9, 2.2) squash would tilt the base into a
+     parallelogram that visibly fights the rectangular eaves below. */
+  const roofGeometry = new THREE.CylinderGeometry(0, 1, 1, 4);
+  roofGeometry.rotateY(Math.PI / 4);
+  const roof = mesh(roofGeometry, orange, -6, 2.6, -4.4, school);
+  roof.scale.set(3.5, 0.9, 2.2); // base spans 4.95 × 3.11 — flush with the eave trim
   box(1.25, 3.2, 1.1, "#e7cf9d", -5.6, 1.7, -3, school);
   box(1.45, 0.2, 1.3, dark, -5.6, 3.4, -3, school);
   const clock = cylinder(0.36, 0.045, cream, -5.6, 2.85, -2.43, school);
@@ -386,7 +385,15 @@ export function createCampus() {
   for (const z of [-1.1, 1.1]) box(0.055, 0.5, 0.055, dark, 0, 0, z, plane);
   box(0.42, 0.055, 1, orange, -0.8, 0.08, 0, plane);
   box(0.38, 0.52, 0.06, orange, -0.85, 0.2, 0, plane);
-  box(0.05, 0.85, 0.075, dark, 1.04, 0, 0, plane);
+  /* Propeller on a hub at the nose, spinning about the fuselage axis so
+     the biplane always looks ready for takeoff (see animate()). */
+  const propeller = new THREE.Group();
+  propeller.position.set(1.06, 0, 0);
+  plane.add(propeller);
+  const hub = cylinder(0.06, 0.09, dark, 0, 0, 0, propeller);
+  hub.rotation.z = Math.PI / 2;
+  box(0.045, 0.86, 0.08, dark, 0, 0, 0, propeller);
+  box(0.045, 0.08, 0.86, "#4c544f", 0, 0, 0, propeller); // second blade, 90° apart
   cylinder(0.08, 0.8, "#837f6c", 0.3, 0.7, -6.5, aviation);
 
   // Community table: a space for learning together.
@@ -505,6 +512,8 @@ export function createCampus() {
       }
       molecule.rotation.y = time * 0.2;
       mathRing.rotation.y = time * 0.25;
+      // The biplane's propeller spins about the fuselage (local X) axis.
+      propeller.rotation.x = time * 16;
     },
     /** Swap a player's look for the easter egg; index matches the roster. */
     setIdentity(playerIndex: number, identityIndex: number) {

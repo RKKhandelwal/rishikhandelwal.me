@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, DM_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
@@ -20,9 +20,27 @@ const monoFont = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.rishikhandelwal.me"),
   title: "Rishi Khandelwal — A little world of curiosity",
   description:
     "A playful collection of Rishi's learning, leadership, and community experiences.",
+  openGraph: {
+    title: "Rishi Khandelwal — A little world of curiosity",
+    description:
+      "Student, teammate, and curious mind: an interactive campus of math, tennis, research, and community.",
+    url: "/",
+    siteName: "Rishi Khandelwal",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rishi Khandelwal — A little world of curiosity",
+    description:
+      "Student, teammate, and curious mind: an interactive campus of math, tennis, research, and community.",
+  },
+};
+export const viewport: Viewport = {
+  themeColor: "#faf9f6",
 };
 
 export default function RootLayout({

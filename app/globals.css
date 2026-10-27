@@ -653,6 +653,30 @@ footer > a {
   background-size: cover;
   border-radius: 6px;
 }
+.story-photo-frame {
+  margin: 0;
+}
+.photo-credit {
+  margin-top: 10px;
+  font:
+    0.68rem var(--font-mono),
+    monospace;
+  color: var(--muted);
+  text-align: right;
+}
+.photo-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.source-list li {
+  margin-bottom: 10px;
+}
+.source-list a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .story-body {
   max-width: 750px;
   margin: auto;
@@ -1336,4 +1360,213 @@ body > main {
   color: #514019;
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+/* =====================================================================
+   Story color system. Each chapter carries an accent + tint pair that
+   flows through the timeline list, the 3D preview card, and the detail
+   page, so six chapters read as six distinct places. Tokens default to
+   the site blue when no color class is present.
+   ===================================================================== */
+.lavender { --story-accent: #7b6bd6; --story-tint: #f1eefb; }
+.yellow { --story-accent: #cf9a1c; --story-tint: #fbf4e0; }
+.blue { --story-accent: #2e5bef; --story-tint: #eaf0fd; }
+.coral { --story-accent: #d1512b; --story-tint: #fbeae2; }
+.mint { --story-accent: #2f9e79; --story-tint: #e7f5ee; }
+.pink { --story-accent: #cf4d8f; --story-tint: #fbeaf2; }
+:where(.timeline-card, .place-card, .story) {
+  --story-accent: var(--accent);
+  --story-tint: #eef1f6;
+}
+
+/* --- Timeline list: hover wash, accented arrow + title --- */
+.timeline-card {
+  position: relative;
+}
+.timeline-card > * {
+  position: relative;
+  z-index: 1;
+}
+.timeline-card::after {
+  content: "";
+  position: absolute;
+  inset: 10px -20px;
+  z-index: 0;
+  background: var(--story-tint);
+  border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.99);
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s ease;
+}
+.timeline-card:hover::after,
+.timeline-card:focus-within::after {
+  opacity: 1;
+  transform: none;
+}
+.timeline-card:hover h3 a {
+  color: var(--story-accent);
+}
+.timeline-card .read-more {
+  color: var(--story-accent);
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.timeline-card:hover .read-more {
+  background: var(--story-accent);
+  border-color: var(--story-accent);
+  color: #ffffff;
+  transform: rotate(-45deg);
+}
+.card-copy h3 a {
+  transition: color 0.2s ease;
+}
+
+/* --- Preview card (3D place-card) accent --- */
+.place-card .eyebrow {
+  color: var(--story-accent);
+}
+.place-card .story-link {
+  color: var(--ink);
+}
+.place-card .story-link:hover {
+  color: var(--story-accent);
+}
+
+/* --- Detail pages: colored tag, drop cap, list markers --- */
+.story .tag {
+  color: var(--story-accent);
+}
+.story .back:hover {
+  color: var(--story-accent);
+}
+.story-body h2 {
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--story-tint);
+}
+.story-body h2::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 12px;
+  background: var(--story-accent);
+  vertical-align: baseline;
+}
+.story-body li::marker {
+  color: var(--story-accent);
+}
+.external {
+  border-bottom-color: var(--story-accent);
+}
+.external:hover {
+  color: var(--story-accent);
+}
+/* Editorial drop cap on the lead paragraph. */
+.lede::first-letter {
+  font-family: var(--font-heading), Arial, sans-serif;
+  font-weight: 500;
+  color: var(--story-accent);
+  font-size: 3.3em;
+  line-height: 0.78;
+  float: left;
+  margin: 8px 14px 0 0;
+}
+
+/* Story entrance: hero then body rise in sequence. */
+@keyframes story-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .story-hero {
+    animation: story-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .story-body {
+    animation: story-rise 0.7s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* =====================================================================
+   Footer social row + custom 404.
+   ===================================================================== */
+.footer-social {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #bdc9d1;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+.footer-social a:hover {
+  color: #ffffff;
+  border-bottom-color: #e4f45a;
+}
+.footer-social svg {
+  width: 16px;
+  height: 16px;
+}
+.not-found {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 7vw;
+  gap: 8px;
+}
+.not-found .tag {
+  font:
+    400 0.75rem var(--font-mono),
+    monospace;
+  letter-spacing: 0.14em;
+  background: #e4f45a;
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin: 0;
+}
+.not-found .ball {
+  width: 78px;
+  height: 78px;
+  margin-bottom: 10px;
+}
+.not-found h1 {
+  font-size: clamp(4rem, 15vw, 11rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+  margin: 10px 0 0;
+}
+.not-found h1 em {
+  color: var(--accent);
+}
+.not-found p {
+  max-width: 440px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 18px auto 0;
+}
+.not-found .text-link {
+  margin-top: 34px;
 }
